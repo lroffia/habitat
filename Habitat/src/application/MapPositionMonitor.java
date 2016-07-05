@@ -102,7 +102,7 @@ public class MapPositionMonitor {
 		panel_Args.add(lblPort);
 		
 		textField_PORT = new JTextField();
-		textField_PORT.setText("77123");
+		textField_PORT.setText("10123");
 		panel_Args.add(textField_PORT);
 		textField_PORT.setColumns(10);
 		

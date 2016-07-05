@@ -26,8 +26,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class RadarSimulator implements PositionListener {
-	private static final String IP ="127.0.0.1";
-	private static final int PORT = 10111;
+	private static final String IP ="mml.arces.unibo.it";
+	private static final int PORT = 10123;
 	private static final String NAME = "Habitat";
 	
 	private static UserIDManager idManager = null;
