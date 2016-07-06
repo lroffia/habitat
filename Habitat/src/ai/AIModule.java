@@ -25,30 +25,29 @@ public class AIModule extends Aggregator {
 		addNamespace("rdfs","http://www.w3.org/2000/01/rdf-schema#");
 	}
 	
-	private String AILocation(String id,String x,String y) {
-		//TODO: qui occorre usare DROOLS per capire l'URI della location in base a X,Y (e forse ID?)
-		
-		return "hbt:DummyLocation_"+id+"_"+x+"_"+y;
+	//TODO: AP2) da invocare per mandare alla SIB l'URI della location di "id"
+	//Esempi di URI: hbt:Bagno, hbt:Room1, hbt:Sala, hbt:RedZone
+	private boolean SendLocation(String id,String locationURI) {
+		Bindings bindings = new Bindings();
+		bindings.addBinding("?id", new BindingURIValue(id));
+		bindings.addBinding("?location", new BindingURIValue(locationURI));
+		return update(bindings);
 	}
 
 	@Override
 	public void notifyAdded(ArrayList<Bindings> arg0) {
-		//Viene chiamata ogni volta che X e/o Y cambiano
 		for (Bindings bindings : arg0) {
 			String id = bindings.getBindingValue("?id").getValue();
 			String x = bindings.getBindingValue("?x").getValue();
-			String y = bindings.getBindingValue("?x").getValue();
+			String y = bindings.getBindingValue("?y").getValue();
 			
-			String locationURI = AILocation(id,x,y);
+			//TODO: AP1) stream di dati da mandare a DROOLS (id,x,y)
 			
-			bindings.addBinding("?location", new BindingURIValue(locationURI));
-			update(bindings);
 		}
 	}
 
 	@Override
 	public void notifyFirst(ArrayList<Bindings> arg0) {
-		//TODO: capire se in base alla condizione iniziale è possibile stabilire già qual'è la location
 		notifyAdded(arg0);
 	}
 	
