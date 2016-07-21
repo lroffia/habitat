@@ -16,7 +16,7 @@ public class AIModule extends Aggregator {
 			+ "INSERT { ?id hbt:hasLocation ?location } "
 			+ "WHERE { ?id hbt:hasLocation ?location }";
 	private static String SUBSCRIBE ="SELECT ?id ?x ?y "
-			+ "WHERE { ?id rdf:type hat:ID . ?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX ?x . ?pos hbt:hasCoordinateY ?y }";
+			+ "WHERE { ?id rdf:type hbt:ID . ?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX ?x . ?pos hbt:hasCoordinateY ?y }";
 	
 	public AIModule() {
 		super(SUBSCRIBE, UPDATE,IP,PORT,NAME);
@@ -27,7 +27,7 @@ public class AIModule extends Aggregator {
 	
 	//TODO: AP2) da invocare per mandare alla SIB l'URI della location di "id"
 	//Esempi di URI: hbt:Bagno, hbt:Room1, hbt:Sala, hbt:RedZone
-	private boolean SendLocation(String id,String locationURI) {
+	public boolean SendLocation(String id,String locationURI) {
 		Bindings bindings = new Bindings();
 		bindings.addBinding("?id", new BindingURIValue(id));
 		bindings.addBinding("?location", new BindingURIValue(locationURI));
