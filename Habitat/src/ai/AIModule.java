@@ -1,6 +1,8 @@
 package ai;
+import java.awt.EventQueue;
 import java.util.ArrayList;
 
+import application.MapPositionMonitor;
 import arces.unibo.SEPA.Aggregator;
 import arces.unibo.SEPA.BindingURIValue;
 import arces.unibo.SEPA.Bindings;
@@ -8,13 +10,16 @@ import arces.unibo.SEPA.BindingsResults;
 
 public class AIModule extends Aggregator {
 
+	public static void main(String[] args) {
+	}
+	
 	private static String IP ="mml.arces.unibo.it";
 	private static int PORT = 10123;
 	private static String NAME = "Habitat";
 	
 	private static String UPDATE ="DELETE { ?id hbt:hasLocation ?oldLocation } "
 			+ "INSERT { ?id hbt:hasLocation ?location } "
-			+ "WHERE { ?id hbt:hasLocation ?location }";
+			+ "WHERE { ?id hbt:hasLocation ?oldLocation }";
 	private static String SUBSCRIBE ="SELECT ?id ?x ?y "
 			+ "WHERE { ?id rdf:type hbt:ID . ?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX ?x . ?pos hbt:hasCoordinateY ?y }";
 	
