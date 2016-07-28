@@ -1,4 +1,4 @@
-package it.unibo.disi.ai;
+package ai;
 
 public class LocationData {
 

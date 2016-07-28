@@ -1,0 +1,53 @@
+//created on: 20-lug-2016
+package it.unibo.disi.ai
+
+import it.unibo.disi.ai.LocationData
+import it.unibo.disi.ai.AIModule
+
+declare LocationData
+  @role(event)
+end
+  
+
+rule "Update location and send it to SIB"
+when
+	$loc : LocationData() from entry-point "LocationDataStream"
+then
+	System.out.println("Coordinates " + $loc.getX() + " " + $loc.getY());
+	if ($loc.getX() >= 113 && $loc.getY() >= 58 && $loc.getX() <= 294 && $loc.getY() <= 216)
+    {
+		$loc.setLocationURI("hbt:Studio304");
+		$loc.getAIModule().send($loc.getId(), "hbt:Studio304");
+	}
+	else if ($loc.getX() >= 303 && $loc.getY() >= 58 && $loc.getX() <= 482 && $loc.getY() <= 216)
+    {
+		$loc.setLocationURI("hbt:Studio305");
+		$loc.getAIModule().send($loc.getId(), "hbt:Studio305");
+	}
+	else if ($loc.getX() >= 490 && $loc.getY() >= 58 && $loc.getX() <= 640 && $loc.getY() <= 216)
+    {
+		$loc.setLocationURI("hbt:AntiWC306");
+		$loc.getAIModule().send($loc.getId(), "hbt:AntiWC306");
+	}
+	else if ($loc.getX() >= 19 && $loc.getY() >= 236 && $loc.getX() <= 549 && $loc.getY() <= 360)
+    {
+		$loc.setLocationURI("hbt:Corridoio303");
+		$loc.getAIModule().send($loc.getId(), "hbt:Corridoio303");
+	}
+	else if ($loc.getX() >= 211 && $loc.getY() >= 379 && $loc.getX() <= 389 && $loc.getY() <= 535)
+    {
+		$loc.setLocationURI("hbt:Studio302");
+		$loc.getAIModule().send($loc.getId(), "hbt:Studio302");
+	}
+	else if ($loc.getX() >= 398 && $loc.getY() >= 382 && $loc.getX() <= 646 && $loc.getY() <= 535)
+    {
+		$loc.setLocationURI("hbt:Studio301");
+		$loc.getAIModule().send($loc.getId(), "hbt:Studio301");
+	}
+	else
+	{
+		$loc.setLocationURI("hbt:Unknown");
+		$loc.getAIModule().send($loc.getId(), "hbt:Unknown");
+	}
+end
+

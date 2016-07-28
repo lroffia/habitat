@@ -1,10 +1,6 @@
-
 package ai;
-import java.awt.EventQueue;
 
 import java.util.ArrayList;
-import java.util.Collection;
-
 import org.kie.api.KieBase;
 import org.kie.api.KieBaseConfiguration;
 import org.kie.api.KieServices;
@@ -13,7 +9,6 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.EntryPoint;
 
-import application.MapPositionMonitor;
 import arces.unibo.SEPA.Aggregator;
 import arces.unibo.SEPA.BindingURIValue;
 import arces.unibo.SEPA.Bindings;
