@@ -19,8 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
-import arces.unibo.tools.Logging;
-import arces.unibo.tools.Logging.VERBOSITY;
+import arces.unibo.SEPA.SPARQLApplicationProfile;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -98,12 +97,15 @@ public class RadarSimulator implements PositionListener {
 	 * Create the application.
 	 */
 	public RadarSimulator() {
+		
 		initialize();
 		
-		idManager = new UserIDManager(IP,PORT,NAME);
-		positionMonitor = new PositionAndLocationMonitor(IP,PORT,NAME,this);
+		//idManager = new UserIDManager(IP,PORT,NAME);
+		//positionMonitor = new PositionAndLocationMonitor(IP,PORT,NAME,this);
 		
-		Logging.setVerbosityLevel(VERBOSITY.DEBUG);
+		SPARQLApplicationProfile.load("Habitat.xml");
+		idManager = new UserIDManager();
+		positionMonitor = new PositionAndLocationMonitor(this);
 		
 		if (!idManager.join()) return;
 		idManager.subscribe(null);

@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import arces.unibo.SEPA.SPARQLApplicationProfile;
 import kp.PositionUpdater;
 import kp.UserIDManager;
 
@@ -116,17 +117,16 @@ public class MapPositionSimulator {
 		btnNewButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {	
-				userIDs = new UserIDManager(txtMmlarcesuniboit.getText(),
-						Integer.parseInt(textField_PORT.getText()),
-						"Habitat");
+				SPARQLApplicationProfile.load("Habitat.xml");
+				//userIDs = new UserIDManager(txtMmlarcesuniboit.getText(),Integer.parseInt(textField_PORT.getText()),"Habitat");
+				userIDs = new UserIDManager();
 				if (!userIDs.join()) return;
 				if (userIDs.subscribe(null) == null) return;
 				String id = userIDs.newID(txtHabitante.getText());
 				
-				positionUpdater = new PositionUpdater(id,
-						txtMmlarcesuniboit.getText(),
-						Integer.parseInt(textField_PORT.getText()),
-						"Habitat");
+				//positionUpdater = new PositionUpdater(id,txtMmlarcesuniboit.getText(),Integer.parseInt(textField_PORT.getText()),"Habitat");
+				positionUpdater = new PositionUpdater(id);
+				
 				if (!positionUpdater.join()) return;
 				
 				btnNewButton.setEnabled(false);

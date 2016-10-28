@@ -30,6 +30,10 @@ public class UserIDManager extends Aggregator {
 		addNamespace("rdfs","http://www.w3.org/2000/01/rdf-schema#");		
 	}
 	
+	public UserIDManager() {
+		super("USER_ID","INSERT_USER");		
+	}
+	
 	public String newID(String label) {
 		if (userIDs.containsKey(label)) return userIDs.get(label);
 		

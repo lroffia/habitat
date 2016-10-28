@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applicationProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ApplicationProfile.xsd">
+  <parameters name="Habitat" port="10123" url="127.0.0.1"/>
+  <namespaces>
+    <namespace prefix="hbt" suffix="http://www.unibo.it/Habitat#"/>
+    <namespace prefix="rdf" suffix="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <namespace prefix="rdfs" suffix="http://www.w3.org/2000/01/rdf-schema#"/>
+  </namespaces>
+  <updates>
+    <update id="UPDATE_USER_POSITION">
+      <sparql><![CDATA[
+    	DELETE { ?pos hbt:hasCoordinateX ?oldX .  ?pos hbt:hasCoordinateY ?oldY } 
+		INSERT { ?pos hbt:hasCoordinateX ?x . ?pos hbt:hasCoordinateY ?y } 
+		WHERE { ?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX ?oldX .  ?pos hbt:hasCoordinateY ?oldY . ?id rdf:type hbt:ID }]]></sparql>
+      <forcedBindings>
+      	<binding type="literal" value="" variable="?x"/>
+        <binding type="literal" value="" variable="?y"/>
+        <binding type="uri" value="" variable="?id"/>
+      </forcedBindings>
+    </update>
+    <update id="INSERT_USER">
+      <sparql><![CDATA[INSERT DATA { 
+      ?id rdf:type hbt:ID . 
+      ?pos rdf:type hbt:Position . 
+      hbt:Unknown rdf:type hbt:Location . 
+      ?id rdfs:label ?label . 
+      ?id hbt:hasPosition ?pos . 
+      ?pos hbt:hasCoordinateX "0" . 
+      ?pos hbt:hasCoordinateY "0" . 
+      ?id hbt:hasLocation hbt:Unknown . 
+      hbt:Unknown rdfs:label "Sconosciuta" }]]></sparql>
+      <forcedBindings>
+      	<binding type="uri" value="" variable="?id"/>
+        <binding type="uri" value="" variable="?pos"/>
+        <binding type="literal" value="" variable="?label"/>
+      </forcedBindings>
+    </update>
+  </updates>
+  <subscribes>
+    <subscribe id="USER_POSITION">
+      <sparql><![CDATA[
+    	SELECT ?id ?label ?x ?y ?loc WHERE { ?id rdf:type hbt:ID . ?id rdfs:label ?label . ?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX ?x . ?pos hbt:hasCoordinateY ?y . ?id hbt:hasLocation ?loc }]]></sparql>
+    </subscribe>
+    <subscribe id="USER_ID">
+      <sparql><![CDATA[
+    	SELECT ?id ?label WHERE { ?id rdf:type hbt:ID . ?id rdfs:label ?label }]]></sparql>
+    </subscribe>
+  </subscribes>
+</applicationProfile>

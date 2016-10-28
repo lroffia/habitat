@@ -24,12 +24,15 @@ public class PositionAndLocationMonitor extends Consumer {
 		mListener = listener;
 	}
 
-
+	public PositionAndLocationMonitor(PositionListener listener) {
+		super("USER_POSITION");
+		mListener = listener;
+	}
+	
 	@Override
 	public void notify(BindingsResults notify) {
 		
 	}
-
 
 	@Override
 	public void notifyAdded(ArrayList<Bindings> bindingsResults) {
@@ -49,7 +52,6 @@ public class PositionAndLocationMonitor extends Consumer {
 			if (mListener != null) {mListener.newPositionAndLocation(id, label,x, y,location);}
 		}	
 	}
-
 
 	@Override
 	public void notifyRemoved(ArrayList<Bindings> bindingsResults) {

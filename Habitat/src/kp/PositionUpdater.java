@@ -18,6 +18,11 @@ public class PositionUpdater extends Producer {
 		this.id = id;
 	}
 	
+	public PositionUpdater(String id) {
+		super("UPDATE_USER_POSITION");
+		this.id = id;
+	}
+	
 	public void updatePosition(int x,int y) {
 		Bindings bindings = new Bindings();
 		bindings.addBinding("?id", new BindingURIValue(id));
