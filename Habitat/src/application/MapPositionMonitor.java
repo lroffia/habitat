@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import arces.unibo.SEPA.SPARQLApplicationProfile;
+import arces.unibo.SEPA.application.ApplicationProfile;
 import kp.PositionAndLocationMonitor;
 import kp.PositionAndLocationMonitor.PositionListener;
 import java.awt.event.WindowAdapter;
@@ -33,6 +33,8 @@ public class MapPositionMonitor {
 	private JButton btnNewButton;
 	
 	private PositionAndLocationMonitor monitor;
+	
+	static ApplicationProfile appProfile = new ApplicationProfile();
 	
 	private class MapPositionListener implements PositionListener {
 
@@ -114,8 +116,8 @@ public class MapPositionMonitor {
 				MapPositionListener listener = new MapPositionListener();
 				
 				//monitor = new PositionAndLocationMonitor(txtMmlarcesuniboit.getText(),Integer.parseInt(textField_PORT.getText()),"Habitat",listener);				
-				SPARQLApplicationProfile.load("Habitat.xml");
-				monitor = new PositionAndLocationMonitor(listener);
+				appProfile.load("Habitat.xml");
+				monitor = new PositionAndLocationMonitor(appProfile,listener);
 				
 				if(!monitor.join()) return;
 				if (monitor.subscribe(null) == null) return;

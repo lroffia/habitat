@@ -1,6 +1,5 @@
 package ai;
 
-import java.util.ArrayList;
 import org.kie.api.KieBase;
 import org.kie.api.KieBaseConfiguration;
 import org.kie.api.KieServices;
@@ -9,19 +8,17 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.EntryPoint;
 
-import arces.unibo.SEPA.Aggregator;
-import arces.unibo.SEPA.BindingURIValue;
-import arces.unibo.SEPA.Bindings;
-import arces.unibo.SEPA.BindingsResults;
+import arces.unibo.SEPA.application.Aggregator;
+import arces.unibo.SEPA.application.ApplicationProfile;
+import arces.unibo.SEPA.commons.ARBindingsResults;
+import arces.unibo.SEPA.commons.Bindings;
+import arces.unibo.SEPA.commons.BindingsResults;
+import arces.unibo.SEPA.commons.RDFTermURI;
 
 public class AIModule extends Aggregator {
 
 	public static void main(String[] args) {
 	}
-	
-	private static String IP ="mml.arces.unibo.it";
-	private static int PORT = 10123;
-	private static String NAME = "Habitat";
 
 	private static KieServices kieServices;
 	private static KieContainer kContainer;
@@ -30,19 +27,8 @@ public class AIModule extends Aggregator {
 
 	private EntryPoint locationDataStream;
 	
-	private static String UPDATE ="DELETE { ?id hbt:hasLocation ?oldLocation } "
-			+ "INSERT { ?id hbt:hasLocation ?location } "
-			+ "WHERE { ?id hbt:hasLocation ?oldLocation }";
-
-	private static String SUBSCRIBE ="SELECT ?id ?x ?y "
-			+ "WHERE { ?id rdf:type hbt:ID . ?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX ?x . ?pos hbt:hasCoordinateY ?y }";
-	
-	public AIModule() {
-		super(SUBSCRIBE, UPDATE,IP,PORT,NAME);
-		addNamespace("hbt","http://www.unibo.it/Habitat#");
-		addNamespace("rdf","http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-		addNamespace("rdfs","http://www.w3.org/2000/01/rdf-schema#");
-		System.out.println("Initialization complete");
+	public AIModule(ApplicationProfile app) {
+		super(app,"USER_POSITION","UPDATE_USER_LOCATION");
 		run();
 	}
 	
@@ -83,18 +69,24 @@ public class AIModule extends Aggregator {
 	//Esempi di URI: hbt:Bagno, hbt:Room1, hbt:Sala, hbt:RedZone
 	private boolean sendLocation(String id, String locationURI) {
 		Bindings bindings = new Bindings();
-		bindings.addBinding("?id", new BindingURIValue(id));
-		bindings.addBinding("?location", new BindingURIValue(locationURI));
+		bindings.addBinding("id", new RDFTermURI(id));
+		bindings.addBinding("location", new RDFTermURI(locationURI));
 		System.out.println("Location sent !");
 		return update(bindings);
 	}
-	
+
 	@Override
-	public void notifyAdded(ArrayList<Bindings> arg0) {
-		for (Bindings bindings : arg0) {
-			String id = bindings.getBindingValue("?id").getValue();
-			String x = bindings.getBindingValue("?x").getValue();
-			String y = bindings.getBindingValue("?y").getValue();
+	public void notify(ARBindingsResults notify, String spuid, Integer sequence) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void notifyAdded(BindingsResults bindingsResults, String spuid, Integer sequence) {
+		for (Bindings bindings : bindingsResults.getBindings()) {
+			String id = bindings.getBindingValue("id");
+			String x = bindings.getBindingValue("x");
+			String y = bindings.getBindingValue("y");
 			
 			//TODO: AP1) stream di dati da mandare a DROOLS (id,x,y)
 			System.out.println("New position arrived for id=" + id + " at coordinates x=" + x + " and y=" + y);
@@ -106,12 +98,18 @@ public class AIModule extends Aggregator {
 	}
 
 	@Override
-	public void notifyFirst(ArrayList<Bindings> arg0) {
-		notifyAdded(arg0);
-		for (Bindings bindings : arg0) {
-			String id = bindings.getBindingValue("?id").getValue();
-			String x = bindings.getBindingValue("?x").getValue();
-			String y = bindings.getBindingValue("?y").getValue();
+	public void notifyRemoved(BindingsResults bindingsResults, String spuid, Integer sequence) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onSubscribe(BindingsResults bindingsResults, String spuid) {
+		notifyAdded(bindingsResults,spuid,0);
+		for (Bindings bindings : bindingsResults.getBindings()) {
+			String id = bindings.getBindingValue("id");
+			String x = bindings.getBindingValue("x");
+			String y = bindings.getBindingValue("y");
 			
 			System.out.println("New position arrived for id=" + id + " at coordinates x=" + x + " and y=" + y);
 			
@@ -119,12 +117,7 @@ public class AIModule extends Aggregator {
 			locationDataStream.insert(locationData);
 			kSession.fireAllRules();
 		}
+		
 	}
-	
-	@Override
-	public void notify(BindingsResults arg0) {}
-
-	@Override
-	public void notifyRemoved(ArrayList<Bindings> arg0) {}
 
 }

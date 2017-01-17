@@ -19,15 +19,12 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
-import arces.unibo.SEPA.SPARQLApplicationProfile;
+import arces.unibo.SEPA.application.ApplicationProfile;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class RadarSimulator implements PositionListener {
-	private static final String IP ="mml.arces.unibo.it";
-	private static final int PORT = 10123;
-	private static final String NAME = "Habitat";
 	
 	private static UserIDManager idManager = null;
 	private static HashMap<String,RadarSimulatorThread> runningThreads = new HashMap<String,RadarSimulatorThread>();
@@ -37,6 +34,8 @@ public class RadarSimulator implements PositionListener {
 	private String idTableHeader[] = new String[] {"URI", "ID","X","Y","LOCATION"};
 	private DefaultTableModel idDM;
 	
+	ApplicationProfile appProfile = new ApplicationProfile();
+	
 	private class RadarSimulatorThread extends Thread {
 		boolean running = true;
 		private PositionUpdater positionUpdater = null;
@@ -45,7 +44,7 @@ public class RadarSimulator implements PositionListener {
 		private int MAX_Y = 10;
 		
 		public RadarSimulatorThread(String id) {
-			positionUpdater = new PositionUpdater(id,IP,PORT,NAME);
+			positionUpdater = new PositionUpdater(appProfile,id);
 		}
 		
 		public void stopRunning() {
@@ -103,9 +102,9 @@ public class RadarSimulator implements PositionListener {
 		//idManager = new UserIDManager(IP,PORT,NAME);
 		//positionMonitor = new PositionAndLocationMonitor(IP,PORT,NAME,this);
 		
-		SPARQLApplicationProfile.load("Habitat.xml");
-		idManager = new UserIDManager();
-		positionMonitor = new PositionAndLocationMonitor(this);
+		appProfile.load("Habitat.sap");
+		idManager = new UserIDManager(appProfile);
+		positionMonitor = new PositionAndLocationMonitor(appProfile,this);
 		
 		if (!idManager.join()) return;
 		idManager.subscribe(null);

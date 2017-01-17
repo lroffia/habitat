@@ -6,14 +6,16 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
+import arces.unibo.SEPA.application.ApplicationProfile;
+
 public class AIModuleApplication {
 
 	private AIModule ai;
 	private JFrame frame;
 
-	public AIModuleApplication()
+	public AIModuleApplication(ApplicationProfile app)
 	{
-		ai = new AIModule();
+		ai = new AIModule(app);
 		
 		if (ai.join() == false)
 		{
@@ -48,7 +50,9 @@ public class AIModuleApplication {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					AIModuleApplication aiModuleApplication = new AIModuleApplication();
+					ApplicationProfile app = new ApplicationProfile();
+					app.load("Habitat.sap");
+					AIModuleApplication aiModuleApplication = new AIModuleApplication(app);
 					aiModuleApplication.frame.setVisible(true);
 
 				} catch (Exception e) {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <applicationProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ApplicationProfile.xsd">
-  <parameters name="Habitat" port="10123" url="127.0.0.1"/>
+  <parameters path="/sparql" subscribePort="9000" updatePort="8000" url="mml.arces.unibo.it"/>
   <namespaces>
     <namespace prefix="hbt" suffix="http://www.unibo.it/Habitat#"/>
     <namespace prefix="rdf" suffix="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
@@ -13,9 +13,19 @@
 		INSERT { ?pos hbt:hasCoordinateX ?x . ?pos hbt:hasCoordinateY ?y } 
 		WHERE { ?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX ?oldX .  ?pos hbt:hasCoordinateY ?oldY . ?id rdf:type hbt:ID }]]></sparql>
       <forcedBindings>
-      	<binding type="literal" value="" variable="?x"/>
-        <binding type="literal" value="" variable="?y"/>
-        <binding type="uri" value="" variable="?id"/>
+      	<binding type="literal" value="" variable="x"/>
+        <binding type="literal" value="" variable="y"/>
+        <binding type="uri" value="" variable="id"/>
+      </forcedBindings>
+    </update>
+    <update id="UPDATE_USER_LOCATION">
+      <sparql><![CDATA[
+    	DELETE { ?id hbt:hasLocation ?oldLocation } 
+		INSERT { ?id hbt:hasLocation ?location } 
+		WHERE { ?id hbt:hasLocation ?oldLocation }]]></sparql>
+      <forcedBindings>
+      	<binding type="uri" value="" variable="location"/>
+        <binding type="uri" value="" variable="id"/>
       </forcedBindings>
     </update>
     <update id="INSERT_USER">
@@ -30,9 +40,9 @@
       ?id hbt:hasLocation hbt:Unknown . 
       hbt:Unknown rdfs:label "Sconosciuta" }]]></sparql>
       <forcedBindings>
-      	<binding type="uri" value="" variable="?id"/>
-        <binding type="uri" value="" variable="?pos"/>
-        <binding type="literal" value="" variable="?label"/>
+      	<binding type="uri" value="" variable="id"/>
+        <binding type="uri" value="" variable="pos"/>
+        <binding type="literal" value="" variable="label"/>
       </forcedBindings>
     </update>
   </updates>

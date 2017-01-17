@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="kie-api-6.4.0.Final.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/SEPATools"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/LabIDRFIDReader"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
