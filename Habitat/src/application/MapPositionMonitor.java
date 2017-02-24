@@ -116,7 +116,7 @@ public class MapPositionMonitor {
 				MapPositionListener listener = new MapPositionListener();
 				
 				//monitor = new PositionAndLocationMonitor(txtMmlarcesuniboit.getText(),Integer.parseInt(textField_PORT.getText()),"Habitat",listener);				
-				appProfile.load("Habitat.xml");
+				appProfile.load("Habitat.sap");
 				monitor = new PositionAndLocationMonitor(appProfile,listener);
 				
 				if(!monitor.join()) return;

@@ -5,11 +5,11 @@ import java.util.UUID;
 
 import arces.unibo.SEPA.application.Aggregator;
 import arces.unibo.SEPA.application.ApplicationProfile;
-import arces.unibo.SEPA.commons.ARBindingsResults;
-import arces.unibo.SEPA.commons.Bindings;
-import arces.unibo.SEPA.commons.BindingsResults;
-import arces.unibo.SEPA.commons.RDFTermLiteral;
-import arces.unibo.SEPA.commons.RDFTermURI;
+import arces.unibo.SEPA.commons.SPARQL.ARBindingsResults;
+import arces.unibo.SEPA.commons.SPARQL.Bindings;
+import arces.unibo.SEPA.commons.SPARQL.BindingsResults;
+import arces.unibo.SEPA.commons.SPARQL.RDFTermLiteral;
+import arces.unibo.SEPA.commons.SPARQL.RDFTermURI;
 
 public class UserIDManager extends Aggregator {
 	private HashMap<String,String> userIDs = new HashMap<String,String>();
@@ -59,5 +59,11 @@ public class UserIDManager extends Aggregator {
 		for(Bindings bindings : bindingsResults.getBindings()) {
 			userIDs.put(bindings.getBindingValue("label"), bindings.getBindingValue("id"));
 		}
+	}
+
+	@Override
+	public void brokenSubscription() {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -10,10 +10,10 @@ import org.kie.api.runtime.rule.EntryPoint;
 
 import arces.unibo.SEPA.application.Aggregator;
 import arces.unibo.SEPA.application.ApplicationProfile;
-import arces.unibo.SEPA.commons.ARBindingsResults;
-import arces.unibo.SEPA.commons.Bindings;
-import arces.unibo.SEPA.commons.BindingsResults;
-import arces.unibo.SEPA.commons.RDFTermURI;
+import arces.unibo.SEPA.commons.SPARQL.ARBindingsResults;
+import arces.unibo.SEPA.commons.SPARQL.Bindings;
+import arces.unibo.SEPA.commons.SPARQL.BindingsResults;
+import arces.unibo.SEPA.commons.SPARQL.RDFTermURI;
 
 public class AIModule extends Aggregator {
 
@@ -117,6 +117,12 @@ public class AIModule extends Aggregator {
 			locationDataStream.insert(locationData);
 			kSession.fireAllRules();
 		}
+		
+	}
+
+	@Override
+	public void brokenSubscription() {
+		// TODO Auto-generated method stub
 		
 	}
 
