@@ -7,6 +7,24 @@
     <namespace prefix="rdfs" suffix="http://www.w3.org/2000/01/rdf-schema#"/>
   </namespaces>
   <updates>
+ 
+    <update id="INSERT_USER">
+      <sparql><![CDATA[
+    	INSERT DATA { 
+			?id rdf:type hbt:ID . 
+			?pos rdf:type hbt:Position . 
+			hbt:Unknown rdf:type hbt:Location . 
+			?id rdfs:label ?label . 
+			?id rdfs:role ?role . 		
+			?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX "-1" . ?pos hbt:hasCoordinateY "-1" . 
+			?id hbt:hasLocation hbt:Unknown . hbt:Unknown rdfs:label "Sconosciuta" }
+			]]></sparql>
+      <forcedBindings>
+      	<binding type="literal" value="" variable="x"/>
+        <binding type="literal" value="" variable="y"/>
+        <binding type="uri" value="" variable="id"/>
+      </forcedBindings>
+    </update>
     <update id="UPDATE_USER_POSITION">
       <sparql><![CDATA[
     	DELETE { ?pos hbt:hasCoordinateX ?oldX .  ?pos hbt:hasCoordinateY ?oldY } 
@@ -28,17 +46,19 @@
         <binding type="uri" value="" variable="id"/>
       </forcedBindings>
     </update>
-    <update id="INSERT_USER">
-      <sparql><![CDATA[INSERT DATA { 
-      ?id rdf:type hbt:ID . 
-      ?pos rdf:type hbt:Position . 
-      hbt:Unknown rdf:type hbt:Location . 
-      ?id rdfs:label ?label . 
-      ?id hbt:hasPosition ?pos . 
-      ?pos hbt:hasCoordinateX "0" . 
-      ?pos hbt:hasCoordinateY "0" . 
-      ?id hbt:hasLocation hbt:Unknown . 
-      hbt:Unknown rdfs:label "Sconosciuta" }]]></sparql>
+    <update id="INSERT_ALARM">
+      <sparql><![CDATA["INSERT DATA { 
+      		?alarmId rdf:type hbt:AlarmID . 
+      		?patId rdf:type hbt:ID . 
+			?opId rdf:type hbt:ID .  	
+			hbt:ToBeAnswered rdf:type rdfs:label . 
+			?patLoc rdf:type hbt:Location . 
+			?patId hbt:hasLocation ?patLoc . 
+			?alarmId hbt:concernPatient ?patId . 
+			?alarmId hbt:concernOperator ?opId . 
+			?alarmId rdfs:severity ?severity . 
+			?alarmId rdfs:answer "toBeAnswered" .
+			?alarmId rdfs:detail ?detail }]]></sparql>
       <forcedBindings>
       	<binding type="uri" value="" variable="id"/>
         <binding type="uri" value="" variable="pos"/>
@@ -47,13 +67,42 @@
     </update>
   </updates>
   <subscribes>
+  
+  <subscribe id="ID">
+      <sparql><![CDATA[
+     SELECT ?id ?label WHERE { ?id rdf:type hbt:ID . ?id rdfs:label ?label }
+     ]]></sparql>
+    </subscribe>
     <subscribe id="USER_POSITION">
       <sparql><![CDATA[
-    	SELECT ?id ?label ?x ?y ?loc WHERE { ?id rdf:type hbt:ID . ?id rdfs:label ?label . ?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX ?x . ?pos hbt:hasCoordinateY ?y . ?id hbt:hasLocation ?loc }]]></sparql>
+      SELECT ?id ?label ?role ?x ?y WHERE { ?id rdf:type hbt:ID . ?id rdfs:label ?label . ?id rdfs:role ?role . 
+      ?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX ?x . ?pos hbt:hasCoordinateY ?y }]]></sparql>
     </subscribe>
-    <subscribe id="USER_ID">
+    <subscribe id="POSITION_AND_ALARM">
       <sparql><![CDATA[
-    	SELECT ?id ?label WHERE { ?id rdf:type hbt:ID . ?id rdfs:label ?label }]]></sparql>
+    	SELECT ?id ?label ?role ?x ?y ?loc ?alarmId
+			WHERE { ?id rdf:type hbt:ID . 
+			OPTIONAL { ?alarmId hbt:concernPatient ?id } . 
+			?id rdfs:label ?label .
+			?id rdfs:role ?role .  
+			?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX ?x . ?pos hbt:hasCoordinateY ?y . 
+			?id hbt:hasLocation ?loc }"
+    	]]></sparql>
+    </subscribe>
+    <subscribe id="PATIENT_ALARM">
+      <sparql><![CDATA[
+    	SELECT ?alarmId ?patId ?patLabel ?opId ?opLabel ?severity ?detail ?answer 
+		WHERE { ?alarmId rdf:type hbt:AlarmID . 
+				?patId rdf:type hbt:ID . 
+				?opId rdf:type hbt:ID . 
+				?opId rdfs:label ?opLabel . 
+				?patId rdfs:label ?patLabel . 
+				?alarmId hbt:concernPatient ?patId . 
+				?alarmId hbt:concernOperator ?opId . 
+				?alarmId rdfs:severity ?severity . 
+				?alarmId rdfs:detail ?detail . 
+				?alarmId rdfs:answer ?answer }
+    	]]></sparql>
     </subscribe>
   </subscribes>
 </applicationProfile>

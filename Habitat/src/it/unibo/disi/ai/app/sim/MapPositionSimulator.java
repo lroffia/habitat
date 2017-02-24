@@ -1,29 +1,27 @@
-package application;
+package it.unibo.disi.ai.app.sim;
+
+import java.awt.BorderLayout;
+import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.JButton;
 import javax.swing.JFrame;
-
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.BorderLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import arces.unibo.SEPA.application.ApplicationProfile;
-import kp.PositionUpdater;
-import kp.UserIDManager;
-
-import javax.swing.JButton;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import it.unibo.disi.ai.entities.Role;
 
 public class MapPositionSimulator {
 
@@ -39,8 +37,6 @@ public class MapPositionSimulator {
 	
 	private UserIDManager userIDs = null;
 	private PositionUpdater positionUpdater = null;
-	
-	ApplicationProfile appProfile = new ApplicationProfile();
 	
 	/**
 	 * Launch the application.
@@ -85,8 +81,8 @@ public class MapPositionSimulator {
 		frmHabitatSimulatore.setBounds(100, 100, 670, 650);
 		frmHabitatSimulatore.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JPanel panel_Map = new JPanel();
-		frmHabitatSimulatore.getContentPane().add(panel_Map, BorderLayout.CENTER);
+		//JPanel panel_Map = new JPanel();
+		//frmHabitatSimulatore.getContentPane().add(panel_Map, BorderLayout.CENTER);
 		
 		JPanel panel_Args = new JPanel();
 		frmHabitatSimulatore.getContentPane().add(panel_Args, BorderLayout.NORTH);
@@ -95,7 +91,7 @@ public class MapPositionSimulator {
 		panel_Args.add(lblIp);
 		
 		txtMmlarcesuniboit = new JTextField();
-		txtMmlarcesuniboit.setText("mml.arces.unibo.it");
+		txtMmlarcesuniboit.setText("localhost"); //txtMmlarcesuniboit.setText("mml.arces.unibo.it");
 		panel_Args.add(txtMmlarcesuniboit);
 		txtMmlarcesuniboit.setColumns(10);
 		
@@ -118,17 +114,17 @@ public class MapPositionSimulator {
 		btnNewButton = new JButton("Go!");
 		btnNewButton.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {	
-				appProfile.load("Habitat.xml");
-				//userIDs = new UserIDManager(txtMmlarcesuniboit.getText(),Integer.parseInt(textField_PORT.getText()),"Habitat");
+			public void mouseClicked(MouseEvent e) {
+				ApplicationProfile appProfile = new ApplicationProfile();
+				appProfile.load("Habitat.sap");
+				txtMmlarcesuniboit.setText(appProfile.getParameters().getUrl());
 				userIDs = new UserIDManager(appProfile);
 				if (!userIDs.join()) return;
 				if (userIDs.subscribe(null) == null) return;
-				String id = userIDs.newID(txtHabitante.getText());
+				String id = userIDs.newID(txtHabitante.getText(), Role.OPERATOR);
+				//String id = userIDs.newID(txtHabitante.getText()); //ORIGINAL
 				
-				//positionUpdater = new PositionUpdater(id,txtMmlarcesuniboit.getText(),Integer.parseInt(textField_PORT.getText()),"Habitat");
 				positionUpdater = new PositionUpdater(appProfile,id);
-				
 				if (!positionUpdater.join()) return;
 				
 				btnNewButton.setEnabled(false);
@@ -141,7 +137,7 @@ public class MapPositionSimulator {
 		
 		BufferedImage map = null;
 		try {
-			map = ImageIO.read(new File("ArcesMap.bmp"));
+			map = ImageIO.read(new File(getClass().getResource("/ArcesMap.bmp").getFile()));
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

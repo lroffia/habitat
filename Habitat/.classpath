@@ -3,6 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="kie-api-6.4.0.Final.jar"/>
+	<classpathentry kind="lib" path="SEPAPI.jar"/>
+	<classpathentry kind="lib" path="miglayout15-swing.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/SEPATools"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/LabIDRFIDReader"/>
 	<classpathentry kind="output" path="bin"/>
