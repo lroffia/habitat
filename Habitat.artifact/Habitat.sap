@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applicationProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ApplicationProfile.xsd">
+  <parameters path="/sparql" subscribePort="9000" updatePort="8000" url="mml.arces.unibo.it"/>
+  <namespaces>
+    <namespace prefix="hbt" suffix="http://www.unibo.it/Habitat#"/>
+    <namespace prefix="rdf" suffix="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <namespace prefix="rdfs" suffix="http://www.w3.org/2000/01/rdf-schema#"/>
+  </namespaces>
+  <updates>
+    <update id="INSERT_USER">
+      <sparql><![CDATA[
+    	INSERT DATA { 
+			?id rdf:type hbt:ID . 
+			?pos rdf:type hbt:Position . 
+			hbt:Unknown rdf:type hbt:Location . 
+			?id rdfs:label ?label . 
+			?id hbt:role ?role . 		
+			?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX "-1" . ?pos hbt:hasCoordinateY "-1" . 
+			?id hbt:hasLocation hbt:Unknown . hbt:Unknown rdfs:label "Sconosciuta" }
+			]]></sparql>
+      <forcedBindings>
+      	<binding type="literal" value="" variable="label"/>
+        <binding type="literal" value="" variable="role"/>
+        <binding type="uri" value="" variable="id"/>
+        <binding type="uri" value="" variable="pos"/>
+      </forcedBindings>
+    </update>
+    <update id="UPDATE_USER_POSITION">
+      <sparql><![CDATA[
+    	DELETE { ?pos hbt:hasCoordinateX ?oldX .  ?pos hbt:hasCoordinateY ?oldY } 
+		INSERT { ?pos hbt:hasCoordinateX ?x . ?pos hbt:hasCoordinateY ?y } 
+		WHERE { ?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX ?oldX .  ?pos hbt:hasCoordinateY ?oldY . ?id rdf:type hbt:ID }]]></sparql>
+      <forcedBindings>
+      	<binding type="literal" value="" variable="x"/>
+        <binding type="literal" value="" variable="y"/>
+        <binding type="uri" value="" variable="id"/>
+      </forcedBindings>
+    </update>
+    <update id="UPDATE_USER_LOCATION">
+      <sparql><![CDATA[
+    	DELETE { ?id hbt:hasLocation ?oldLocation } 
+		INSERT { ?id hbt:hasLocation ?location } 
+		WHERE { ?id hbt:hasLocation ?oldLocation }]]></sparql>
+      <forcedBindings>
+      	<binding type="uri" value="" variable="location"/>
+        <binding type="uri" value="" variable="id"/>
+      </forcedBindings>
+    </update>
+    <update id="INSERT_ALARM">
+      <sparql><![CDATA[INSERT DATA { 
+      		?alarmId rdf:type hbt:AlarmID . 
+      		?patId rdf:type hbt:ID . 
+			?opId rdf:type hbt:ID .  	
+			?patLoc rdf:type hbt:Location . 
+			?patId hbt:hasLocation ?patLoc . 
+			?alarmId hbt:concernPatient ?patId . 
+			?alarmId hbt:concernOperator ?opId . 
+			?alarmId hbt:severity ?severity . 
+			?alarmId hbt:answer "toBeAnswered" .
+			?alarmId hbt:detail ?detail }]]></sparql>
+      <forcedBindings>
+      	<binding type="uri" value="" variable="alarmId"/>
+        <binding type="uri" value="" variable="patId"/>
+        <binding type="uri" value="" variable="opId"/>
+        <binding type="uri" value="" variable="patLoc"/>
+        <binding type="literal" value="" variable="severity"/>
+        <binding type="literal" value="" variable="detail"/>
+      </forcedBindings>
+    </update>
+  </updates>
+  <subscribes>
+  
+  <subscribe id="ID">
+      <sparql><![CDATA[
+     SELECT ?id ?label WHERE { ?id rdf:type hbt:ID . ?id rdfs:label ?label }
+     ]]></sparql>
+    </subscribe>
+    <subscribe id="USER_POSITION">
+      <sparql><![CDATA[
+      SELECT ?id ?label ?role ?x ?y WHERE { ?id rdf:type hbt:ID . ?id rdfs:label ?label . ?id hbt:role ?role . 
+      ?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX ?x . ?pos hbt:hasCoordinateY ?y }]]></sparql>
+    </subscribe>
+    <subscribe id="POSITION_AND_ALARM">
+      <sparql><![CDATA[
+    	SELECT ?id ?label ?role ?x ?y ?loc ?alarmId WHERE { ?id rdf:type hbt:ID . 
+			OPTIONAL { ?alarmId hbt:concernPatient ?id } . 
+			?id rdfs:label ?label .
+			?id hbt:role ?role .  
+			?id hbt:hasPosition ?pos . ?pos hbt:hasCoordinateX ?x . ?pos hbt:hasCoordinateY ?y . 
+			?id hbt:hasLocation ?loc }
+    	]]></sparql>
+    </subscribe>
+    <subscribe id="PATIENT_ALARM">
+      <sparql><![CDATA[
+    	SELECT ?alarmId ?patId ?patLabel ?opId ?opLabel ?severity ?detail ?answer WHERE { ?alarmId rdf:type hbt:AlarmID . 
+				?patId rdf:type hbt:ID . 
+				?opId rdf:type hbt:ID . 
+				?opId rdfs:label ?opLabel . 
+				?patId rdfs:label ?patLabel . 
+				?alarmId hbt:concernPatient ?patId . 
+				?alarmId hbt:concernOperator ?opId . 
+				?alarmId hbt:severity ?severity . 
+				?alarmId hbt:detail ?detail . 
+				?alarmId hbt:answer ?answer }
+    	]]></sparql>
+    </subscribe>
+  </subscribes>
+</applicationProfile>

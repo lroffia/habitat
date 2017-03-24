@@ -1,0 +1,149 @@
+//created on: 20-lug-2016
+package it.unibo.disi.habitat.ai
+
+import it.unibo.disi.habitat.ai.entities.LocationEvent
+import it.unibo.disi.habitat.ai.AIModule
+import it.unibo.disi.habitat.ai.entities.AlarmEvent
+import it.unibo.disi.habitat.ai.entities.UserCache
+import it.unibo.disi.habitat.ai.entities.User
+import it.unibo.disi.habitat.ai.entities.Role
+
+declare LocationEvent
+  @propertyReactive
+  @role(event)
+  @timestamp(timestamp)
+end
+
+declare AlarmEvent
+  @role(event)
+  @timestamp(timestamp)
+end
+
+
+rule "Update hbt:Studio304 location and send it to SIB"
+when
+	$loc : LocationEvent(x >= 113 , y >= 58 , x <= 294 , y <= 216) from entry-point "EventStream"
+then
+	modify($loc) {setLocationURI("hbt:Studio304")}  
+	$loc.getAIModule().send($loc.getId(), "hbt:Studio304");
+	$loc.getAIModule().getUserCache().updatePosition($loc.getId(), $loc.getX(), $loc.getY(), $loc.getLocationURI());
+end
+
+rule "Update hbt:Studio305 location and send it to SIB"
+when
+	$loc : LocationEvent(x >= 303 , y >= 58 , x <= 482 , y <= 216) from entry-point "EventStream"
+then
+	modify($loc) {setLocationURI("hbt:Studio305")}  
+	$loc.getAIModule().send($loc.getId(), "hbt:Studio305");
+	$loc.getAIModule().getUserCache().updatePosition($loc.getId(), $loc.getX(), $loc.getY(), $loc.getLocationURI());
+end
+
+rule "Update AntiWC306 location and send it to SIB"
+when
+	$loc : LocationEvent(x >= 490 , y >= 58 , x <= 640 , y <= 216) from entry-point "EventStream"
+then
+	modify($loc) {setLocationURI("hbt:AntiWC306")}  
+	$loc.getAIModule().send($loc.getId(), "hbt:AntiWC306");
+	$loc.getAIModule().getUserCache().updatePosition($loc.getId(), $loc.getX(), $loc.getY(), $loc.getLocationURI());
+end
+
+rule "Update hbt:Corridoio303 location and send it to SIB"
+when
+	$loc : LocationEvent(x > 80 , y >= 236 , x <= 549 , y <= 360) from entry-point "EventStream"
+then
+	modify($loc) {setLocationURI("hbt:Corridoio303")}  
+	$loc.getAIModule().send($loc.getId(), "hbt:Corridoio303");
+	$loc.getAIModule().getUserCache().updatePosition($loc.getId(), $loc.getX(), $loc.getY(), $loc.getLocationURI());
+end
+
+rule "Update hbt:Exit location and send it to SIB"
+when
+	$loc : LocationEvent(x >= 19 , y >= 236 , x <= 80 , y <= 360) from entry-point "EventStream"
+then
+	modify($loc) {setLocationURI("hbt:Exit")}  
+	$loc.getAIModule().send($loc.getId(), "hbt:Exit");
+	$loc.getAIModule().getUserCache().updatePosition($loc.getId(), $loc.getX(), $loc.getY(), $loc.getLocationURI());
+end
+
+rule "Update hbt:Studio302 location and send it to SIB"
+when
+	$loc : LocationEvent(x >= 211 , y >= 379 , x <= 389 , y <= 535) from entry-point "EventStream"
+then
+	modify($loc) {setLocationURI("hbt:Studio302")}  
+	$loc.getAIModule().send($loc.getId(), "hbt:Studio302");
+	$loc.getAIModule().getUserCache().updatePosition($loc.getId(), $loc.getX(), $loc.getY(), $loc.getLocationURI());
+end
+	
+rule "Update hbt:Studio301 location and send it to SIB"
+when
+	$loc : LocationEvent(x >= 398 , y >= 382 , x <= 646 , y <= 535) from entry-point "EventStream"
+then
+	modify($loc) {setLocationURI("hbt:Studio301")}  
+	$loc.getAIModule().send($loc.getId(), "hbt:Studio301");
+	$loc.getAIModule().getUserCache().updatePosition($loc.getId(), $loc.getX(), $loc.getY(), $loc.getLocationURI());
+end	
+
+rule "Update hbt:Unknown location and send it to SIB"
+salience -1
+when
+	$loc : LocationEvent(x < 19 || x>640 || y<58 || y>535 || (x<113 && y<236) || 
+			(y>360 && x<211) || (y > 216 && x > 549 && y < 382) ) from entry-point "EventStream"
+then
+	modify($loc) {setLocationURI("hbt:Unknown")}  
+	$loc.getAIModule().send($loc.getId(), "hbt:Unknown");
+	$loc.getAIModule().getUserCache().updatePosition($loc.getId(), $loc.getX(), $loc.getY(), $loc.getLocationURI());
+end	
+
+/*$nearestOp : LocationEvent() from accumulate(
+		$aLoc : LocationEvent(role==Role.OPERATOR, $aLocX: x, $aLocY : y),
+		init( LocationEvent minle = null; int mincSquare = Integer.MAX_VALUE; ),
+		action( 
+			int cSquare=($aLocX-$loc.getX())^2+($aLocY-$loc.getY())^2;
+			if( cSquare < mincSquare ){
+                minle = $aLoc;
+                mincSquare = cSquare;
+            } ),
+        result (minle)
+)*/
+
+rule "Patient in the Exit zone"
+when 
+	$loc : LocationEvent(role==Role.PATIENT , locationURI == "hbt:Exit", $x : x, $y : y) from entry-point "EventStream"
+then
+	//find the nearest operator
+    User nearestOp = $loc.getAIModule().getUserCache().getNearestUser($x,$y,Role.OPERATOR);
+    System.out.println("Nearest OPERATOR is "+ nearestOp.getLabel() );
+    
+    String patientName = $loc.getAIModule().getUserCache().getUser($loc.getId()).getLabel();
+    System.out.println("EXIT zone has detected patient "+patientName);
+    
+    //generate a new alarm event
+    AlarmEvent alarmEvent = $loc.getAIModule().generateAlarmAndSend( $loc.getId(), nearestOp.getId(), 
+    						"hbt:Exit", it.unibo.disi.habitat.ai.entities.AlarmSeverity.RED ,
+    						"The patient "+patientName+" is going to Exit.");
+    //insert(alarmEvent);
+end
+    
+rule "Nothing happens in 5s after a light event in the hbt:AntiWC306 - YELLOW"
+when
+	//$loc : LocationEvent( $loc.getRole()==Role.PATIENT, $loc.getX() >= 490 , $loc.getY() >= 58 , $loc.getX() <= 640 , $loc.getY() <= 216) from entry-point "EventStream"
+	$loc : LocationEvent(role==Role.PATIENT , locationURI == "hbt:AntiWC306", $x : x, $y : y) from entry-point "EventStream"
+	not $loc2 : LocationEvent($loc != $loc2, $loc.getId()==$loc2.getId() ,this after[0s,5s] $loc) from entry-point "EventStream"	
+then
+    //$loc.setLocationURI("hbt:Lost");  //here the patient maintains its last location, even when he disappers
+    //$loc.getAIModule().send($loc.getId(), "hbt:Lost");
+    
+    //find the nearest operator
+    User nearestOp = $loc.getAIModule().getUserCache().getNearestUser($x,$y,Role.OPERATOR);
+    System.out.println("Nearest OPERATOR is "+ nearestOp.getLabel() );
+    
+    String patientName = $loc.getAIModule().getUserCache().getUser($loc.getId()).getLabel();
+    System.out.println("LOST contact with patient "+patientName);
+    
+    //generate a new alarm event
+    AlarmEvent alarmEvent = $loc.getAIModule().generateAlarmAndSend( $loc.getId(), nearestOp.getId(), 
+    						"hbt:AntiWC306", it.unibo.disi.habitat.ai.entities.AlarmSeverity.YELLOW ,
+    						"The patient "+patientName+" is in AntiWC306 for too long.");
+   // insert(alarmEvent);
+end
+
